@@ -5,6 +5,8 @@
  */
 package UI.page;
 
+import UI.ClientFrame;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -35,10 +37,14 @@ public class LoginPage extends Page{
         loginButton.setSize(new Dimension(400, 60));
         loginButton.setLocation(new Point(1000, 740));
         loginButton.addActionListener(e -> {
-            //TODO 로그인
-            System.out.println("login");
+            login();
         });
         loginButton.setVisible(true);
         page.add(loginButton);
+    }
+
+    private void login(){
+        ClientFrame.getInstance().connect();
+
     }
 }

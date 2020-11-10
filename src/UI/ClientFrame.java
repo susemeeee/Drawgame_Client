@@ -8,17 +8,21 @@ package UI;
 import UI.page.LoginPage;
 import UI.page.Page;
 import UI.page.Pagetype;
+import net.Connection;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.EnumMap;
 
 public class ClientFrame {
+    private Connection connection;
+
     private JFrame frame;
     private EnumMap<Pagetype, Page> pages;
     private Pagetype currentPage;
 
     private ClientFrame(){
+        connection = new Connection();
         frame = new JFrame();
         initFrame();
         pages = new EnumMap<>(Pagetype.class);
@@ -55,6 +59,10 @@ public class ClientFrame {
         frame.revalidate();
         frame.repaint();
         currentPage = type;
+    }
+
+    public void connect(){
+        connection.connect("localhost", 9002);
     }
 
     public static ClientFrame getInstance(){
