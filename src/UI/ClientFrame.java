@@ -9,10 +9,17 @@ import UI.page.LoginPage;
 import UI.page.Page;
 import UI.page.Pagetype;
 import datatype.User;
+import datatype.packet.Packet;
+import datatype.packet.PacketType;
 import net.Connection;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.EnumMap;
 
 public class ClientFrame {
@@ -68,7 +75,24 @@ public class ClientFrame {
     }
 
     public void login(){
-        //TODO 로그인 프로토콜 만들어서 전송
+        if(user == null){
+            return;
+        }
+        Packet packet = new Packet(PacketType.LOGIN);
+        packet.addData("name", user.getName());
+        ImageIcon icon = user.getCharacterIcon();
+        Image img = icon.getImage();
+        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null), img.getHeight(null),
+                BufferedImage.TYPE_INT_RGB);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(bufferedImage, "png", out);
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        packet.addData("characterIcon", Base64.getEncoder().encodeToString(out.toByteArray()));
+        connection.send(packet);
     }
 
     public void setUser(User user){

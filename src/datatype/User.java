@@ -6,6 +6,7 @@
 package datatype;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class User {
     private String name;
@@ -13,6 +14,22 @@ public class User {
 
     public User(String name, ImageIcon characterIcon){
         this.name = name;
+        this.characterIcon = characterIcon;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ImageIcon getCharacterIcon() {
+        return characterIcon;
+    }
+
+    public void setCharacterIcon(ImageIcon characterIcon) {
         this.characterIcon = characterIcon;
     }
 }
