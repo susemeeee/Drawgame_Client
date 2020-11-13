@@ -10,6 +10,11 @@ import javax.swing.*;
 public abstract class Page {
     protected JPanel page;
 
+    public Page(){
+        page = new JPanel();
+        initPage();
+    }
+
     protected abstract void initPage();
     protected abstract void setView();
 

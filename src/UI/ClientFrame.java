@@ -6,6 +6,7 @@
 package UI;
 
 import UI.page.LoginPage;
+import UI.page.MainPage;
 import UI.page.Page;
 import UI.page.Pagetype;
 import datatype.User;
@@ -32,7 +33,7 @@ public class ClientFrame {
 
     private ClientFrame(){
         connection = new Connection();
-        frame = new JFrame();
+        frame = new JFrame("Drawing Game");
         initFrame();
         pages = new EnumMap<>(Pagetype.class);
         addPages();
@@ -49,12 +50,16 @@ public class ClientFrame {
 
     private void addPages(){
         pages.put(Pagetype.LOGIN, new LoginPage());
+        pages.put(Pagetype.MAIN_PAGE, new MainPage());
     }
 
     public void resetPage(Pagetype type){
         Page newPage = null;
         if(type == Pagetype.LOGIN){
             newPage = new LoginPage();
+        }
+        else if(type == Pagetype.MAIN_PAGE){
+            newPage = new MainPage();
         }
 
         if(newPage != null){
@@ -78,6 +83,7 @@ public class ClientFrame {
         if(user == null){
             return;
         }
+
         Packet packet = new Packet(PacketType.LOGIN);
         packet.addData("name", user.getName());
         ImageIcon icon = user.getCharacterIcon();
@@ -92,7 +98,9 @@ public class ClientFrame {
             e.printStackTrace();
         }
         packet.addData("characterIcon", Base64.getEncoder().encodeToString(out.toByteArray()));
-        connection.send(packet);
+        //connection.send(packet);
+
+        switchPage(Pagetype.MAIN_PAGE);
     }
 
     public void setUser(User user){

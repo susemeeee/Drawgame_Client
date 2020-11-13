@@ -6,7 +6,6 @@
 package datatype;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class User {
     private String name;

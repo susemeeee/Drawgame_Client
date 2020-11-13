@@ -19,8 +19,7 @@ public class LoginPage extends Page{
     private JButton loginButton;
 
     public LoginPage(){
-        page = new JPanel();
-        initPage();
+        super();
         setView();
     }
 
@@ -92,7 +91,7 @@ public class LoginPage extends Page{
 
     private void login(){
         if(username.getText().length() >= 1){
-            ClientFrame.getInstance().connect();
+            //ClientFrame.getInstance().connect();
             ClientFrame.getInstance().setUser(new User(username.getText(), characterIcon));
             ClientFrame.getInstance().login();
         }

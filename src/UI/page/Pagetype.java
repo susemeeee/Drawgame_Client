@@ -6,5 +6,5 @@
 package UI.page;
 
 public enum Pagetype {
-    LOGIN
+    LOGIN, MAIN_PAGE
 }
