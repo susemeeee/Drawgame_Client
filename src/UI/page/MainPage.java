@@ -78,12 +78,27 @@ public class MainPage extends Page {
                 parsonData[i] = "";
             }
         }
-        roomListView.setListData(roomNames);
         roomListView.clearSelection();
-        parsonCountListView.setListData(parsonData);
         parsonCountListView.clearSelection();
+        roomListView.setListData(roomData);
+        parsonCountListView.setListData(parsonData);
 
+
+        page.revalidate();
         page.repaint();
+    }
+
+    public void makeRoom(){
+        if(roomName.getText().length() < 1){
+            JOptionPane.showMessageDialog(null, "방 이름을 입력하세요.", "error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Packet packet = new Packet(PacketType.MAKE_ROOM);
+        packet.addData("roomname", roomName.getText());
+        packet.addData("maxperson", (String)roomParson.getSelectedItem());
+        packet.addData("maxround", (String)round.getSelectedItem());
+        ClientFrame.getInstance().send(packet);
     }
 
     @Override
@@ -93,16 +108,6 @@ public class MainPage extends Page {
         roomListView.setLocation(new Point(100, 100));
         roomListView.setFont(new Font("SanSerif", Font.PLAIN, 28));
         roomListView.setFixedCellHeight(roomListView.getHeight() / 10);
-        roomListView.setCellRenderer(new DefaultListCellRenderer(){
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-                                                          boolean cellHasFocus) {
-                JLabel listCellRenderer = (JLabel)super.getListCellRendererComponent(list, value, index,
-                        isSelected, cellHasFocus);
-                listCellRenderer.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-                return listCellRenderer;
-            }
-        });
         roomListView.addListSelectionListener(e -> {
             if(roomListView.getSelectedIndex() >= currentPageRoomCount){
                 roomListView.clearSelection();
@@ -112,6 +117,16 @@ public class MainPage extends Page {
             }
             parsonCountListView.setSelectedIndex(roomListView.getSelectedIndex());
             page.repaint();
+        });
+        roomListView.setCellRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
+                JLabel listCellRenderer = (JLabel)super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+                listCellRenderer.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+                return listCellRenderer;
+            }
         });
         roomListView.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
         roomListView.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -241,7 +256,7 @@ public class MainPage extends Page {
         makeRoomButton.setLocation(new Point(1050, 500));
         makeRoomButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         makeRoomButton.addActionListener(e -> {
-
+            makeRoom();
         });
         makeRoomButton.setVisible(true);
         page.add(makeRoomButton);
