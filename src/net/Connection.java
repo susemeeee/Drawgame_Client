@@ -5,7 +5,10 @@
  */
 package net;
 
+import UI.ClientFrame;
 import datatype.packet.Packet;
+import datatype.packet.PacketType;
+import util.DataMaker;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -16,6 +19,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Connection {
     private SocketChannel client;
@@ -23,22 +27,12 @@ public class Connection {
     private Thread clientThread;
     private ByteBuffer buffer;
 
-    private ByteArrayInputStream byteArrayInputStream;
-    private ObjectInputStream objectInputStream;
-    private ByteArrayOutputStream byteArrayOutputStream;
-    private ObjectOutputStream objectOutputStream;
-
     public void connect(String address, int port){
         try {
             selector = Selector.open();
             client = SocketChannel.open(new InetSocketAddress(address, port));
             client.configureBlocking(false);
             client.register(selector, SelectionKey.OP_READ);
-            buffer = ByteBuffer.allocate(1048576);
-            byteArrayOutputStream = new ByteArrayOutputStream();
-            objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            byteArrayInputStream = null;
-            objectInputStream = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,19 +61,30 @@ public class Connection {
     }
 
     private void read(SelectionKey key){
+        buffer = ByteBuffer.allocate(1048576);
+        ByteBuffer data = ByteBuffer.allocate(1048576);
         try {
             buffer.clear();
-            ((SocketChannel)key.channel()).read(buffer);
+            data.clear();
+            SocketChannel socketChannel = ((SocketChannel)key.channel());
 
-            if(byteArrayInputStream == null){
-                byteArrayInputStream = new ByteArrayInputStream(buffer.array());
-                objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            while(client.read(data) > 0){
+                data.flip();
+                buffer.put(data);
+                data = ByteBuffer.allocate(1048576);
             }
-            byteArrayInputStream.read(buffer.array());
-            Packet data = (Packet) objectInputStream.readObject();
-            System.out.println(data); // test
+            buffer.flip();
+            byte[] array = new byte[buffer.limit()];
+            buffer.get(array, 0, buffer.limit());
+            Map<String, String> receivedPacket = DataMaker.make(new String(array));
+
+            if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.RESPONSE_ROOM){
+                responseRoomData(receivedPacket);
+            }
+
+            System.out.println(receivedPacket.toString()); // test
             //TODO 들어온 데이터 바인드
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -91,6 +96,27 @@ public class Connection {
             client.write(buffer);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void responseRoomData(Map<String, String> receivedPacket){
+        int totalRoom = Integer.parseInt(receivedPacket.get("totalroom"));
+        if(totalRoom != 0){
+            String[] roomNames = new String[totalRoom];
+            String[] roomMaxPerson = new String[totalRoom];
+            String[] roomCurrentPerson = new String[totalRoom];
+
+            for(int i = 0; i < totalRoom; i++){
+                roomNames[i] = receivedPacket.get("room" + (i + 1) + "_name");
+                roomMaxPerson[i] = receivedPacket.get("room" + (i + 1) + "_maxuser");
+                roomCurrentPerson[i] = receivedPacket.get("room" + (i + 1) + "_currentuser");
+            }
+
+            ClientFrame.getInstance().responseRoomData(totalRoom, roomNames, roomMaxPerson, roomCurrentPerson);
+        }
+        else{
+            ClientFrame.getInstance().responseRoomData(0, null,
+                    null, null);
         }
     }
 }

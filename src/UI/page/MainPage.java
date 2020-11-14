@@ -5,11 +5,17 @@
  */
 package UI.page;
 
+import UI.ClientFrame;
+import datatype.packet.Packet;
+import datatype.packet.PacketType;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MainPage extends Page {
+    private int prevPageNumber;
     private int pageNumber;
+    private int currentPageRoomCount;
 
     private JList<String> roomListView;
     private JList<String> parsonCountListView;
@@ -25,6 +31,8 @@ public class MainPage extends Page {
     public MainPage(){
         super();
         pageNumber = 1;
+        prevPageNumber = 1;
+        currentPageRoomCount = 0;
         setView();
     }
 
@@ -37,13 +45,53 @@ public class MainPage extends Page {
         page.setVisible(true);
     }
 
+    public void requestRoomData(){
+        Packet packet = new Packet(PacketType.REQUEST_ROOM);
+        packet.addData("page", Integer.toString(pageNumber));
+        ClientFrame.getInstance().send(packet);
+    }
+
+    public void responseRoomData(int totalRoomCount, String[] roomNames,
+                                 String[] roomMaxPerson, String[] roomCurrentPerson){
+        if(pageNumber != 1 && totalRoomCount == 0){
+            pageNumber = prevPageNumber;
+            return;
+        }
+        else if(pageNumber == 1 && totalRoomCount == 0){
+            currentPageRoomCount = totalRoomCount;
+            String[] data = new String[]{"", "", "", "", "", "", "", "", "", ""};
+            roomListView.setListData(data);
+            parsonCountListView.setListData(data);
+            page.repaint();
+            return;
+        }
+        currentPageRoomCount = totalRoomCount;
+        String[] roomData = new String[10];
+        String[] parsonData = new String[10];
+        for(int i = 0; i < 10; i++){
+            if(i < totalRoomCount){
+                roomData[i] = " " + roomNames[i];
+                parsonData[i] = " " + roomCurrentPerson[i] + " / " + roomMaxPerson[i];
+            }
+            else{
+                roomData[i] = "";
+                parsonData[i] = "";
+            }
+        }
+        roomListView.setListData(roomNames);
+        roomListView.clearSelection();
+        parsonCountListView.setListData(parsonData);
+        parsonCountListView.clearSelection();
+
+        page.repaint();
+    }
+
     @Override
     protected void setView() {
         roomListView = new JList<>();
         roomListView.setSize(new Dimension(700, 750));
         roomListView.setLocation(new Point(100, 100));
         roomListView.setFont(new Font("SanSerif", Font.PLAIN, 28));
-        roomListView.setListData(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}); //test
         roomListView.setFixedCellHeight(roomListView.getHeight() / 10);
         roomListView.setCellRenderer(new DefaultListCellRenderer(){
             @Override
@@ -56,6 +104,12 @@ public class MainPage extends Page {
             }
         });
         roomListView.addListSelectionListener(e -> {
+            if(roomListView.getSelectedIndex() >= currentPageRoomCount){
+                roomListView.clearSelection();
+                parsonCountListView.clearSelection();
+                page.repaint();
+                return;
+            }
             parsonCountListView.setSelectedIndex(roomListView.getSelectedIndex());
             page.repaint();
         });
@@ -68,10 +122,17 @@ public class MainPage extends Page {
         parsonCountListView.setSize(new Dimension(100, 750));
         parsonCountListView.setLocation(new Point(800, 100));
         parsonCountListView.setFont(new Font("SanSerif", Font.PLAIN, 28));
-        //test
-        parsonCountListView.setListData(new String[]{" 1 / 8", "1 / 8", "1 / 8", "1 / 8", "1 / 8", "1 / 8", "1 / 8", "1 / 8", "1 / 8", "1 / 8"}); //test
-
         parsonCountListView.setFixedCellHeight(parsonCountListView.getHeight() / 10);
+        parsonCountListView.addListSelectionListener(e -> {
+            if(parsonCountListView.getSelectedIndex() >= currentPageRoomCount){
+                roomListView.clearSelection();
+                parsonCountListView.clearSelection();
+                page.repaint();
+                return;
+            }
+            roomListView.setSelectedIndex(parsonCountListView.getSelectedIndex());
+            page.repaint();
+        });
         parsonCountListView.setCellRenderer(new DefaultListCellRenderer(){
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
@@ -99,7 +160,11 @@ public class MainPage extends Page {
         prevPageButton.setSize(new Dimension(80, 50));
         prevPageButton.setLocation(new Point(320, 880));
         prevPageButton.addActionListener(e -> {
-
+            if(pageNumber > 1){
+                prevPageNumber = pageNumber;
+                pageNumber--;
+            }
+            requestRoomData();
         });
         prevPageButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         prevPageButton.setVisible(true);
@@ -109,7 +174,9 @@ public class MainPage extends Page {
         nextPageButton.setSize(new Dimension(80, 50));
         nextPageButton.setLocation(new Point(600, 880));
         nextPageButton.addActionListener(e -> {
-
+            prevPageNumber = pageNumber;
+            pageNumber++;
+            requestRoomData();
         });
         nextPageButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         nextPageButton.setVisible(true);

@@ -98,9 +98,20 @@ public class ClientFrame {
             e.printStackTrace();
         }
         packet.addData("characterIcon", Base64.getEncoder().encodeToString(out.toByteArray()));
-        //connection.send(packet);
+        connection.send(packet);
 
         switchPage(Pagetype.MAIN_PAGE);
+        ((MainPage)pages.get(Pagetype.MAIN_PAGE)).requestRoomData();
+    }
+
+    public void responseRoomData(int totalRoomCount, String[] roomNames,
+                                 String[] roomMaxPerson, String[] roomCurrentPerson){
+        ((MainPage)pages.get(Pagetype.MAIN_PAGE)).responseRoomData(totalRoomCount, roomNames,
+                roomMaxPerson, roomCurrentPerson);
+    }
+
+    public void send(Packet packet){
+        connection.send(packet);
     }
 
     public void setUser(User user){
