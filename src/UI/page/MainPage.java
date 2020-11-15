@@ -83,6 +83,7 @@ public class MainPage extends Page {
         roomListView.setListData(roomData);
         parsonCountListView.setListData(parsonData);
 
+        pageNumberText.setText(Integer.toString(pageNumber));
 
         page.revalidate();
         page.repaint();
