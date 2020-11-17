@@ -8,6 +8,8 @@ package UI.page;
 import UI.ClientFrame;
 import UI.page.element.CharacterArea;
 import UI.page.element.ChatFrame;
+import datatype.packet.Packet;
+import datatype.packet.PacketType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +21,9 @@ import java.util.List;
 public class GamePage extends Page {
     private final int MAX_USER = 8;
 
+    private boolean isReady;
+    private int userID;
+
     private ChatFrame chatFrame;
     private List<CharacterArea> characterAreas;
     private Canvas canvas;
@@ -29,6 +34,7 @@ public class GamePage extends Page {
 
     public GamePage(){
         super();
+        isReady = false;
         //chatFrame = new ChatFrame(ClientFrame.getInstance().getFrame().getX(),
         //        ClientFrame.getInstance().getFrame().getY());
         characterAreas = new ArrayList<>();
@@ -45,7 +51,7 @@ public class GamePage extends Page {
     }
 
     public void responseUserData(int currentUser, int totalUser, int[] IDList, String[] names, ImageIcon[] icons,
-                                 int yourID){
+                                 int yourID, boolean[] readyStatusList){
         for(int i = 0; i < totalUser; i++){
             page.add(characterAreas.get(i).getPanel());
         }
@@ -57,15 +63,23 @@ public class GamePage extends Page {
             }
             characterAreas.get(IDList[i]).setUserName(names[i]);
             characterAreas.get(IDList[i]).setUserIcon(icons[i]);
+            characterAreas.get(IDList[i]).setReadyStatusArea(readyStatusList[i]);
         }
         page.repaint();
 
-        if(yourID == 0){
+        userID = yourID;
+        if(userID == 0){
             generateStartButton();
         }
         else{
             generateReadyButton();
         }
+    }
+
+    private void ready(){
+        Packet packet = new Packet(PacketType.READY);
+        packet.addData("status", Boolean.toString(isReady));
+        ClientFrame.getInstance().send(packet);
     }
 
     @Override
@@ -156,7 +170,8 @@ public class GamePage extends Page {
         readyButton.setLocation(new Point(1000, 880));
         readyButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
         readyButton.addActionListener(e -> {
-
+            isReady = !isReady;
+            ready();
         });
         readyButton.setVisible(true);
         page.add(readyButton);

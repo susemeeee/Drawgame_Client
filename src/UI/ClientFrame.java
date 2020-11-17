@@ -109,8 +109,10 @@ public class ClientFrame {
                 roomMaxPerson, roomCurrentPerson, roomIDList);
     }
 
-    public void responseUserData(int currentUser, int totalUser, int[] IDList, String[] names, ImageIcon[] icons, int yourID){
-        ((GamePage)pages.get(PageType.GAME_PAGE)).responseUserData(currentUser, totalUser, IDList, names, icons, yourID);
+    public void responseUserData(int currentUser, int totalUser, int[] IDList, String[] names, ImageIcon[] icons,
+                                 int yourID, boolean[] readyStatusList){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).responseUserData(currentUser, totalUser, IDList, names, icons,
+                yourID, readyStatusList);
     }
 
     public void responseJoinRoomResult(String result){

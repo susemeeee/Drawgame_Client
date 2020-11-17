@@ -33,6 +33,7 @@ public class CharacterArea {
     public void setHostIcon(){
         hostIconArea.setIcon(changeImageSize(new ImageIcon("files/host.png"), 70, 70));
         hostIconArea.setHorizontalAlignment(JLabel.CENTER);
+        readyStatusArea.setText("");
         panel.repaint();
     }
 
@@ -44,6 +45,15 @@ public class CharacterArea {
     public void setUserIcon(ImageIcon icon){
         characterIconArea.setIcon(icon);
         panel.repaint();
+    }
+
+    public void setReadyStatusArea(boolean isReady){
+        if(isReady){
+            readyStatusArea.setForeground(Color.GREEN);
+        }
+        else{
+            readyStatusArea.setForeground(Color.RED);
+        }
     }
 
     private void setView(){
@@ -74,6 +84,7 @@ public class CharacterArea {
         readyStatusArea.setSize(new Dimension(200, 40));
         readyStatusArea.setLocation(new Point(0, 170));
         readyStatusArea.setFont(new Font("SanSerif", Font.PLAIN, 18));
+        readyStatusArea.setForeground(Color.RED);
         readyStatusArea.setHorizontalAlignment(JLabel.CENTER);
         readyStatusArea.setVisible(true);
         panel.add(readyStatusArea);

@@ -122,7 +122,8 @@ public class Connection {
                 roomIDList[i] = Integer.parseInt(receivedPacket.get("room" + (i + 1) + "_id"));
             }
 
-            ClientFrame.getInstance().responseRoomData(totalRoom, roomNames, roomMaxPerson, roomCurrentPerson, roomIDList);
+            ClientFrame.getInstance().responseRoomData(totalRoom, roomNames, roomMaxPerson, roomCurrentPerson,
+                    roomIDList);
         }
         else{
             ClientFrame.getInstance().responseRoomData(0, null,
@@ -137,15 +138,18 @@ public class Connection {
         String[] names = new String[totalUser];
         ImageIcon[] icons = new ImageIcon[totalUser];
         int yourID = Integer.parseInt(receivedPacket.get("yourID"));
+        boolean[] readyStatusList = new boolean[totalUser];
 
         for(int i = 0; i < currentUser; i++){
             IDList[i] = Integer.parseInt(receivedPacket.get("user" + i + "_id"));
             names[i] = receivedPacket.get("user" + i + "_name");
             byte[] imageBytes = Base64.getDecoder().decode(receivedPacket.get("user" + i + "_characterIcon"));
             icons[i] = new ImageIcon(imageBytes);
+            readyStatusList[i] = Boolean.parseBoolean(receivedPacket.get("user" + i + "_readystatus"));
         }
 
-        ClientFrame.getInstance().responseUserData(currentUser, totalUser, IDList, names, icons, yourID);
+        ClientFrame.getInstance().responseUserData(currentUser, totalUser, IDList, names, icons, yourID,
+                readyStatusList);
     }
 
     private void responseJoinRoomResult(Map<String, String> receivedPacket){
