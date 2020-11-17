@@ -35,8 +35,6 @@ public class GamePage extends Page {
     public GamePage(){
         super();
         isReady = false;
-        //chatFrame = new ChatFrame(ClientFrame.getInstance().getFrame().getX(),
-        //        ClientFrame.getInstance().getFrame().getY());
         characterAreas = new ArrayList<>();
         setView();
     }
@@ -129,11 +127,13 @@ public class GamePage extends Page {
         canvasPanel.add(canvas);
         page.add(canvasPanel);
 
-        chatButton = new JButton("chat"); //TODO 이미지 구해서 바꾸기
+        chatButton = new JButton(new ImageIcon("files/chat.png"));
         chatButton.setSize(new Dimension(90, 70));
         chatButton.setLocation(new Point(350, 880));
+        chatButton.setBackground(Color.ORANGE);
         chatButton.addActionListener(e -> {
-
+            chatFrame = new ChatFrame(ClientFrame.getInstance().getFrame().getX(),
+                    ClientFrame.getInstance().getFrame().getY());
         });
         chatButton.setVisible(true);
         page.add(chatButton);
