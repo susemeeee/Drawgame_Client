@@ -5,10 +5,7 @@
  */
 package UI;
 
-import UI.page.LoginPage;
-import UI.page.MainPage;
-import UI.page.Page;
-import UI.page.Pagetype;
+import UI.page.*;
 import datatype.User;
 import datatype.packet.Packet;
 import datatype.packet.PacketType;
@@ -22,22 +19,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.EnumMap;
+import java.util.Map;
 
 public class ClientFrame {
     private Connection connection;
     private User user;
 
     private JFrame frame;
-    private EnumMap<Pagetype, Page> pages;
-    private Pagetype currentPage;
+    private EnumMap<PageType, Page> pages;
+    private PageType currentPage;
 
     private ClientFrame(){
         connection = new Connection();
         frame = new JFrame("Drawing Game");
         initFrame();
-        pages = new EnumMap<>(Pagetype.class);
+        pages = new EnumMap<>(PageType.class);
         addPages();
-        switchPage(Pagetype.LOGIN);
+        switchPage(PageType.LOGIN);
     }
 
     private void initFrame(){
@@ -49,16 +47,17 @@ public class ClientFrame {
     }
 
     private void addPages(){
-        pages.put(Pagetype.LOGIN, new LoginPage());
-        pages.put(Pagetype.MAIN_PAGE, new MainPage());
+        pages.put(PageType.LOGIN, new LoginPage());
+        pages.put(PageType.MAIN_PAGE, new MainPage());
+        pages.put(PageType.GAME_PAGE, new GamePage());
     }
 
-    public void resetPage(Pagetype type){
+    public void resetPage(PageType type){
         Page newPage = null;
-        if(type == Pagetype.LOGIN){
+        if(type == PageType.LOGIN){
             newPage = new LoginPage();
         }
-        else if(type == Pagetype.MAIN_PAGE){
+        else if(type == PageType.MAIN_PAGE){
             newPage = new MainPage();
         }
 
@@ -67,7 +66,7 @@ public class ClientFrame {
         }
     }
 
-    public void switchPage(Pagetype type){
+    public void switchPage(PageType type){
         frame.getContentPane().removeAll();
         frame.add(pages.get(type).getPanel());
         frame.revalidate();
@@ -100,18 +99,31 @@ public class ClientFrame {
         packet.addData("characterIcon", Base64.getEncoder().encodeToString(out.toByteArray()));
         connection.send(packet);
 
-        switchPage(Pagetype.MAIN_PAGE);
-        ((MainPage)pages.get(Pagetype.MAIN_PAGE)).requestRoomData();
+        switchPage(PageType.MAIN_PAGE);
+        ((MainPage)pages.get(PageType.MAIN_PAGE)).requestRoomData();
     }
 
     public void responseRoomData(int totalRoomCount, String[] roomNames,
-                                 String[] roomMaxPerson, String[] roomCurrentPerson){
-        ((MainPage)pages.get(Pagetype.MAIN_PAGE)).responseRoomData(totalRoomCount, roomNames,
-                roomMaxPerson, roomCurrentPerson);
+                                 String[] roomMaxPerson, String[] roomCurrentPerson, int[] roomIDList){
+        ((MainPage)pages.get(PageType.MAIN_PAGE)).responseRoomData(totalRoomCount, roomNames,
+                roomMaxPerson, roomCurrentPerson, roomIDList);
     }
+
+    public void responseUserData(int currentUser, int totalUser, int[] IDList, String[] names, ImageIcon[] icons, int yourID){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).responseUserData(currentUser, totalUser, IDList, names, icons, yourID);
+    }
+
+    public void responseJoinRoomResult(String result){
+        ((MainPage)pages.get(PageType.MAIN_PAGE)).responseJoinRoomResult(result);
+    }
+
 
     public void send(Packet packet){
         connection.send(packet);
+    }
+
+    public User getUser(){
+        return user;
     }
 
     public void setUser(User user){

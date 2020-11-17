@@ -16,6 +16,7 @@ public class MainPage extends Page {
     private int prevPageNumber;
     private int pageNumber;
     private int currentPageRoomCount;
+    private int[] roomIDList;
 
     private JList<String> roomListView;
     private JList<String> parsonCountListView;
@@ -52,7 +53,7 @@ public class MainPage extends Page {
     }
 
     public void responseRoomData(int totalRoomCount, String[] roomNames,
-                                 String[] roomMaxPerson, String[] roomCurrentPerson){
+                                 String[] roomMaxPerson, String[] roomCurrentPerson, int[] roomIDList){
         if(pageNumber != 1 && totalRoomCount == 0){
             pageNumber = prevPageNumber;
             return;
@@ -87,9 +88,11 @@ public class MainPage extends Page {
 
         page.revalidate();
         page.repaint();
+
+        this.roomIDList = roomIDList;
     }
 
-    public void makeRoom(){
+    private void makeRoom(){
         if(roomName.getText().length() < 1){
             JOptionPane.showMessageDialog(null, "방 이름을 입력하세요.", "error",
                     JOptionPane.ERROR_MESSAGE);
@@ -99,6 +102,45 @@ public class MainPage extends Page {
         packet.addData("roomname", roomName.getText());
         packet.addData("maxperson", (String)roomParson.getSelectedItem());
         packet.addData("maxround", (String)round.getSelectedItem());
+        ClientFrame.getInstance().send(packet);
+
+        ClientFrame.getInstance().resetPage(PageType.GAME_PAGE);
+        ClientFrame.getInstance().switchPage(PageType.GAME_PAGE);
+
+        packet = new Packet(PacketType.REQUEST_USER);
+        ClientFrame.getInstance().send(packet);
+    }
+
+    private void joinRoom(){
+        if(roomListView.getSelectedIndex() == -1){
+            return;
+        }
+        Packet packet = new Packet(PacketType.JOIN_ROOM);
+        packet.addData("id", Integer.toString(roomIDList[roomListView.getSelectedIndex()]));
+        ClientFrame.getInstance().send(packet);
+    }
+
+    public void responseJoinRoomResult(String result){
+        if(result.equals("NOT_FOUND")){
+            JOptionPane.showMessageDialog(null, "존재하지 않는 방입니다.", "error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        else if(result.equals("MAX_USER")){
+            JOptionPane.showMessageDialog(null, "인원이 다 찼습니다.", "error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        else if(result.equals("GAME_STARTED")){
+            JOptionPane.showMessageDialog(null, "게임이 시작된 방입니다.", "error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        ClientFrame.getInstance().resetPage(PageType.GAME_PAGE);
+        ClientFrame.getInstance().switchPage(PageType.GAME_PAGE);
+
+        Packet packet = new Packet(PacketType.REQUEST_USER);
         ClientFrame.getInstance().send(packet);
     }
 
@@ -269,7 +311,7 @@ public class MainPage extends Page {
         joinRoomButton.setLocation(new Point(1000, 770));
         joinRoomButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         joinRoomButton.addActionListener(e -> {
-
+            joinRoom();
         });
         joinRoomButton.setVisible(true);
         page.add(joinRoomButton);

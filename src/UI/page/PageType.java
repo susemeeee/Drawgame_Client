@@ -5,6 +5,6 @@
  */
 package UI.page;
 
-public enum Pagetype {
-    LOGIN, MAIN_PAGE
+public enum PageType {
+    LOGIN, MAIN_PAGE, GAME_PAGE
 }

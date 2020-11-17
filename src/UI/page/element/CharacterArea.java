@@ -26,7 +26,24 @@ public class CharacterArea {
         panel.setLocation(x, y);
         panel.setBackground(Color.WHITE);
         panel.setLayout(null);
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         panel.setVisible(true);
+    }
+
+    public void setHostIcon(){
+        hostIconArea.setIcon(changeImageSize(new ImageIcon("files/host.png"), 70, 70));
+        hostIconArea.setHorizontalAlignment(JLabel.CENTER);
+        panel.repaint();
+    }
+
+    public void setUserName(String name){
+        userNameArea.setText(name);
+        panel.repaint();
+    }
+
+    public void setUserIcon(ImageIcon icon){
+        characterIconArea.setIcon(icon);
+        panel.repaint();
     }
 
     private void setView(){
@@ -34,18 +51,18 @@ public class CharacterArea {
         characterIconArea = new JLabel(changeImageSize(new ImageIcon("files/defaultusericon.png"),
                 130, 130));
         characterIconArea.setSize(new Dimension(130, 130));
-        characterIconArea.setLocation(new Point(0, 0));
+        characterIconArea.setLocation(new Point(1, 1));
         characterIconArea.setVisible(true);
         panel.add(characterIconArea);
 
-        hostIconArea = new JLabel(changeImageSize(new ImageIcon("files/host.png"), 70, 70));
+        hostIconArea = new JLabel();
         hostIconArea.setSize(new Dimension(70, 120));
         hostIconArea.setLocation(new Point(130, 0));
         hostIconArea.setHorizontalAlignment(JLabel.CENTER);
         hostIconArea.setVisible(true);
         panel.add(hostIconArea);
 
-        userNameArea = new JLabel("username");
+        userNameArea = new JLabel("");
         userNameArea.setSize(new Dimension(200, 40));
         userNameArea.setLocation(new Point(0, 130));
         userNameArea.setFont(new Font("SanSerif", Font.PLAIN, 18));
