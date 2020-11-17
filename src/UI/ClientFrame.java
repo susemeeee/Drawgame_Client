@@ -121,6 +121,9 @@ public class ClientFrame {
         ((MainPage)pages.get(PageType.MAIN_PAGE)).responseJoinRoomResult(result);
     }
 
+    public void chatReceived(String sender, String content){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).chatReceived(sender, content);
+    }
 
     public void send(Packet packet){
         connection.send(packet);

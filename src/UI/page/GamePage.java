@@ -13,6 +13,8 @@ import datatype.packet.PacketType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -80,6 +82,20 @@ public class GamePage extends Page {
         ClientFrame.getInstance().send(packet);
     }
 
+    private void sendChat(){
+        if(chatFrame.getMessageInputArea().getText().length() >= 1){
+            Packet packet = new Packet(PacketType.CHAT);
+            packet.addData("content", chatFrame.getMessageInputArea().getText());
+            ClientFrame.getInstance().send(packet);
+        }
+    }
+
+    public void chatReceived(String sender, String content){
+        if(chatFrame.getFrame() != null){
+            chatFrame.appendChat(sender, content);
+        }
+    }
+
     @Override
     protected void setView() {
         for(int i = 0; i < MAX_USER; i++){
@@ -134,6 +150,17 @@ public class GamePage extends Page {
         chatButton.addActionListener(e -> {
             chatFrame = new ChatFrame(ClientFrame.getInstance().getFrame().getX(),
                     ClientFrame.getInstance().getFrame().getY());
+            chatFrame.getMessageInputArea().addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                        sendChat();
+                    }
+                }
+            });
+            chatFrame.getSendButton().addActionListener(e1 -> {
+                sendChat();
+            });
         });
         chatButton.setVisible(true);
         page.add(chatButton);

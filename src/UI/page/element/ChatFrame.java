@@ -7,8 +7,6 @@ package UI.page.element;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class ChatFrame {
     private JFrame frame;
@@ -51,14 +49,6 @@ public class ChatFrame {
         messageInputArea.setSize(new Dimension(320, 40));
         messageInputArea.setLocation(new Point(0, 920));
         messageInputArea.setFont(new Font("SanSerif", Font.PLAIN, 18));
-        messageInputArea.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER){
-
-                }
-            }
-        });
         messageInputArea.setVisible(true);
         frame.add(messageInputArea);
 
@@ -66,10 +56,25 @@ public class ChatFrame {
         sendButton.setSize(new Dimension(60, 40));
         sendButton.setLocation(320, 920);
         sendButton.setFont(new Font("SanSerif", Font.BOLD, 24));
-        sendButton.addActionListener(e -> {
-
-        });
         sendButton.setVisible(true);
         frame.add(sendButton);
+    }
+
+    public void appendChat(String sender, String content){
+        chatArea.append(sender + ": " + content + "\n");
+        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+        frame.repaint();
+    }
+
+    public JTextField getMessageInputArea() {
+        return messageInputArea;
+    }
+
+    public JButton getSendButton() {
+        return sendButton;
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

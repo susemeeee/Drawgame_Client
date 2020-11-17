@@ -68,7 +68,6 @@ public class Connection {
         try {
             buffer.clear();
             data.clear();
-            SocketChannel socketChannel = ((SocketChannel)key.channel());
 
             while(client.read(data) > 0){
                 data.flip();
@@ -89,11 +88,15 @@ public class Connection {
             else if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.JOIN_ROOM_RESULT){
                 responseJoinRoomResult(receivedPacket);
             }
+            else if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.CHAT){
+                ClientFrame.getInstance().chatReceived(receivedPacket.get("sender"), receivedPacket.get("content"));
+            }
 
             System.out.println(receivedPacket.toString()); // test
-            //TODO 들어온 데이터 바인드
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
+            //TODO 연결 끊어짐
         }
     }
 
