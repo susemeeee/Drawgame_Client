@@ -43,7 +43,7 @@ public class CharacterArea {
     }
 
     public void setUserIcon(ImageIcon icon){
-        characterIconArea.setIcon(icon);
+        characterIconArea.setIcon(changeImageSize(icon, 130, 130));
         panel.repaint();
     }
 

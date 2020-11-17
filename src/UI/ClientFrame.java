@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.EnumMap;
-import java.util.Map;
 
 public class ClientFrame {
     private Connection connection;
@@ -91,8 +90,11 @@ public class ClientFrame {
                 BufferedImage.TYPE_INT_RGB);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
+            Graphics2D g;
+            g = bufferedImage.createGraphics();
+            icon.paintIcon(null, g, 0, 0);
             ImageIO.write(bufferedImage, "png", out);
-            out.flush();
+            g.dispose();
         } catch (IOException e) {
             e.printStackTrace();
         }
