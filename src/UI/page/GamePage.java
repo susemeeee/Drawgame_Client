@@ -25,6 +25,7 @@ public class GamePage extends Page {
 
     private boolean isReady;
     private int userID;
+    private boolean isAllReady;
 
     private ChatFrame chatFrame;
     private List<CharacterArea> characterAreas;
@@ -37,6 +38,7 @@ public class GamePage extends Page {
     public GamePage(){
         super();
         isReady = false;
+        isAllReady = false;
         characterAreas = new ArrayList<>();
         setView();
     }
@@ -51,7 +53,7 @@ public class GamePage extends Page {
     }
 
     public void responseUserData(int currentUser, int totalUser, int[] IDList, String[] names, ImageIcon[] icons,
-                                 int yourID, boolean[] readyStatusList){
+                                 int yourID){
         for(int i = 0; i < totalUser; i++){
             page.add(characterAreas.get(i).getPanel());
         }
@@ -63,7 +65,6 @@ public class GamePage extends Page {
             }
             characterAreas.get(IDList[i]).setUserName(names[i]);
             characterAreas.get(IDList[i]).setUserIcon(icons[i]);
-            characterAreas.get(IDList[i]).setReadyStatusArea(readyStatusList[i]);
         }
         page.repaint();
 
@@ -87,12 +88,34 @@ public class GamePage extends Page {
             Packet packet = new Packet(PacketType.CHAT);
             packet.addData("content", chatFrame.getMessageInputArea().getText());
             ClientFrame.getInstance().send(packet);
+            chatFrame.getMessageInputArea().setText("");
         }
     }
 
     public void chatReceived(String sender, String content){
         if(chatFrame.getFrame() != null){
             chatFrame.appendChat(sender, content);
+        }
+    }
+
+    public void start(){
+        Packet packet = new Packet(PacketType.START_REQUEST);
+        ClientFrame.getInstance().send(packet);
+    }
+
+    public void responseStartResult(boolean startAble){
+        if(startAble){
+            System.out.println("game start");
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "모두가 준비 되지 않았습니다.", "",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void readyStatusReceived(boolean[] readyStatusList, int[] IDList){
+        for(int i = 0; i < MAX_USER; i++){
+            characterAreas.get(IDList[i]).setReadyStatusArea(readyStatusList[i]);
         }
     }
 
@@ -182,9 +205,8 @@ public class GamePage extends Page {
         startButton.setLocation(new Point(1000, 880));
         startButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
         startButton.addActionListener(e -> {
-
+            start();
         });
-        startButton.setEnabled(false);
         startButton.setVisible(true);
         page.add(startButton);
 

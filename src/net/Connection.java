@@ -79,20 +79,27 @@ public class Connection {
             buffer.get(array, 0, buffer.limit());
             Map<String, String> receivedPacket = DataMaker.make(new String(array));
 
-            if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.RESPONSE_ROOM){
+            PacketType type = PacketType.valueOf(receivedPacket.get("type"));
+            if(type == PacketType.RESPONSE_ROOM){
                 responseRoomData(receivedPacket);
             }
-            else if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.RESPONSE_USER){
+            else if(type == PacketType.RESPONSE_USER){
                 responseUserData(receivedPacket);
             }
-            else if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.JOIN_ROOM_RESULT){
+            else if(type == PacketType.JOIN_ROOM_RESULT){
                 responseJoinRoomResult(receivedPacket);
             }
-            else if(PacketType.valueOf(receivedPacket.get("type")) == PacketType.CHAT){
+            else if(type == PacketType.CHAT){
                 ClientFrame.getInstance().chatReceived(receivedPacket.get("sender"), receivedPacket.get("content"));
             }
+            else if(type == PacketType.READY){
+                readyStatusReceived(receivedPacket);
+            }
+            else if(type == PacketType.START_REQUEST){
+                ClientFrame.getInstance().responseStartResult(Boolean.parseBoolean(receivedPacket.get("status")));
+            }
 
-            System.out.println(receivedPacket.toString()); // test
+            //System.out.println(receivedPacket.toString()); // test
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
@@ -141,22 +148,31 @@ public class Connection {
         String[] names = new String[totalUser];
         ImageIcon[] icons = new ImageIcon[totalUser];
         int yourID = Integer.parseInt(receivedPacket.get("yourID"));
-        boolean[] readyStatusList = new boolean[totalUser];
 
         for(int i = 0; i < currentUser; i++){
             IDList[i] = Integer.parseInt(receivedPacket.get("user" + i + "_id"));
             names[i] = receivedPacket.get("user" + i + "_name");
             byte[] imageBytes = Base64.getDecoder().decode(receivedPacket.get("user" + i + "_characterIcon"));
             icons[i] = new ImageIcon(imageBytes);
-            readyStatusList[i] = Boolean.parseBoolean(receivedPacket.get("user" + i + "_readystatus"));
         }
 
-        ClientFrame.getInstance().responseUserData(currentUser, totalUser, IDList, names, icons, yourID,
-                readyStatusList);
+        ClientFrame.getInstance().responseUserData(currentUser, totalUser, IDList, names, icons, yourID);
     }
 
     private void responseJoinRoomResult(Map<String, String> receivedPacket){
         String result = receivedPacket.get("result");
         ClientFrame.getInstance().responseJoinRoomResult(result);
+    }
+
+    private void readyStatusReceived(Map<String, String> receivedPacket){
+        boolean[] readyStatus = new boolean[8];
+        int[] idList = new int[8];
+
+        for(int i = 0; i < 8; i++){
+            readyStatus[i] = Boolean.parseBoolean(receivedPacket.get("user" + i + "_readystatus"));
+            idList[i] = i;
+        }
+
+        ClientFrame.getInstance().readyStatusReceived(readyStatus, idList);
     }
 }

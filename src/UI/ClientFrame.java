@@ -112,9 +112,9 @@ public class ClientFrame {
     }
 
     public void responseUserData(int currentUser, int totalUser, int[] IDList, String[] names, ImageIcon[] icons,
-                                 int yourID, boolean[] readyStatusList){
+                                 int yourID){
         ((GamePage)pages.get(PageType.GAME_PAGE)).responseUserData(currentUser, totalUser, IDList, names, icons,
-                yourID, readyStatusList);
+                yourID);
     }
 
     public void responseJoinRoomResult(String result){
@@ -123,6 +123,14 @@ public class ClientFrame {
 
     public void chatReceived(String sender, String content){
         ((GamePage)pages.get(PageType.GAME_PAGE)).chatReceived(sender, content);
+    }
+
+    public void readyStatusReceived(boolean[] readyStatusList, int[] idList){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).readyStatusReceived(readyStatusList, idList);
+    }
+
+    public void responseStartResult(boolean startAble){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).responseStartResult(startAble);
     }
 
     public void send(Packet packet){
