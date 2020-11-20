@@ -14,6 +14,8 @@ import net.Connection;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,7 +43,15 @@ public class ClientFrame {
         frame.setSize(new Dimension(1500, 1000));
         frame.setResizable(false);
         frame.setLayout(new GridLayout(1, 1));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if(connection.isConnected()){
+                    connection.disconnect();
+                }
+                System.exit(0);
+            }
+        });
         frame.setVisible(true);
     }
 

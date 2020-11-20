@@ -98,12 +98,17 @@ public class Connection {
             else if(type == PacketType.START_REQUEST){
                 ClientFrame.getInstance().responseStartResult(Boolean.parseBoolean(receivedPacket.get("status")));
             }
+            else if(type == PacketType.DISCONNECT){
+                client.close();
+                JOptionPane.showMessageDialog(null, "서버가 종료 되었습니다.", "error",
+                        JOptionPane.ERROR_MESSAGE);
+                System.exit(2);
+            }
 
             //System.out.println(receivedPacket.toString()); // test
         } catch (IOException e) {
-            e.printStackTrace();
+            disconnect();
             System.exit(1);
-            //TODO 연결 끊어짐
         }
     }
 
@@ -113,8 +118,27 @@ public class Connection {
             buffer = charset.encode(data.toString());
             client.write(buffer);
         } catch (IOException e) {
-            e.printStackTrace();
+            disconnect();
+            System.exit(1);
         }
+    }
+
+    public void disconnect(){
+        Packet packet = new Packet(PacketType.DISCONNECT);
+        send(packet);
+        try {
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    public boolean isConnected(){
+        if(client == null){
+            return false;
+        }
+        return client.isConnected();
     }
 
     private void responseRoomData(Map<String, String> receivedPacket){
