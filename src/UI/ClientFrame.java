@@ -69,6 +69,9 @@ public class ClientFrame {
         else if(type == PageType.MAIN_PAGE){
             newPage = new MainPage();
         }
+        else if(type == PageType.GAME_PAGE){
+            newPage = new GamePage();
+        }
 
         if(newPage != null){
             pages.replace(type, newPage);
@@ -143,12 +146,18 @@ public class ClientFrame {
         ((GamePage)pages.get(PageType.GAME_PAGE)).responseStartResult(startAble);
     }
 
-    public void send(Packet packet){
-        connection.send(packet);
+    public void quitRoom(){
+        Packet packet = new Packet(PacketType.QUIT_ROOM);
+        ClientFrame.getInstance().send(packet);
+
+        ClientFrame.getInstance().resetPage(PageType.MAIN_PAGE);
+        ClientFrame.getInstance().switchPage(PageType.MAIN_PAGE);
+
+        ((MainPage)pages.get(PageType.MAIN_PAGE)).requestRoomData();
     }
 
-    public User getUser(){
-        return user;
+    public void send(Packet packet){
+        connection.send(packet);
     }
 
     public void setUser(User user){

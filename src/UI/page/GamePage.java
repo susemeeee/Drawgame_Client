@@ -59,22 +59,45 @@ public class GamePage extends Page {
         }
         page.repaint();
 
-        for(int i = 0; i < currentUser; i++){
+        for(int i = 0; i < IDList.length; i++){
             if(IDList[i] == 0){
                 characterAreas.get(IDList[i]).setHostIcon();
             }
-            characterAreas.get(IDList[i]).setUserName(names[i]);
-            characterAreas.get(IDList[i]).setUserIcon(icons[i]);
+            characterAreas.get(IDList[i]).setUserName(names[IDList[i]]);
+            characterAreas.get(IDList[i]).setUserIcon(icons[IDList[i]]);
         }
         page.repaint();
 
         userID = yourID;
+
+        if(startButton != null){
+            page.remove(startButton);
+            startButton = null;
+        }
+        if(readyButton != null){
+            page.remove(readyButton);
+            readyButton = null;
+        }
         if(userID == 0){
             generateStartButton();
         }
         else{
             generateReadyButton();
         }
+
+        List<Integer> list = new ArrayList<>();
+        for(int i : IDList){
+            list.add(i);
+        }
+        for(int i = 0; i < MAX_USER; i++){
+            if(!list.contains(i)){
+                characterAreas.get(i).setUserName("");
+                characterAreas.get(i).setUserIcon(new ImageIcon("files/defaultusericon.png"));
+                characterAreas.get(i).setReadyStatusArea(false);
+                characterAreas.get(i).getPanel().repaint();
+            }
+        }
+        page.repaint();
     }
 
     private void ready(){
@@ -117,6 +140,10 @@ public class GamePage extends Page {
         for(int i = 0; i < MAX_USER; i++){
             characterAreas.get(IDList[i]).setReadyStatusArea(readyStatusList[i]);
         }
+    }
+
+    private void quitRoom(){
+        ClientFrame.getInstance().quitRoom();
     }
 
     @Override
@@ -193,7 +220,7 @@ public class GamePage extends Page {
         quitButton.setLocation(new Point(750, 880));
         quitButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
         quitButton.addActionListener(e -> {
-
+            quitRoom();
         });
         quitButton.setVisible(true);
         page.add(quitButton);

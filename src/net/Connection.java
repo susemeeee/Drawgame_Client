@@ -59,12 +59,11 @@ public class Connection {
             }
         });
         clientThread.start();
-        //TODO 로그인 패킷 보내기
     }
 
     private void read(SelectionKey key){
         buffer = ByteBuffer.allocate(1048576);
-        ByteBuffer data = ByteBuffer.allocate(1048576);
+        ByteBuffer data = ByteBuffer.allocate(1024);
         try {
             buffer.clear();
             data.clear();
@@ -72,7 +71,7 @@ public class Connection {
             while(client.read(data) > 0){
                 data.flip();
                 buffer.put(data);
-                data = ByteBuffer.allocate(1048576);
+                data = ByteBuffer.allocate(1024);
             }
             buffer.flip();
             byte[] array = new byte[buffer.limit()];
@@ -118,7 +117,11 @@ public class Connection {
             buffer = charset.encode(data.toString());
             client.write(buffer);
         } catch (IOException e) {
-            disconnect();
+            try {
+                client.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             System.exit(1);
         }
     }
@@ -173,11 +176,13 @@ public class Connection {
         ImageIcon[] icons = new ImageIcon[totalUser];
         int yourID = Integer.parseInt(receivedPacket.get("yourID"));
 
-        for(int i = 0; i < currentUser; i++){
-            IDList[i] = Integer.parseInt(receivedPacket.get("user" + i + "_id"));
-            names[i] = receivedPacket.get("user" + i + "_name");
-            byte[] imageBytes = Base64.getDecoder().decode(receivedPacket.get("user" + i + "_characterIcon"));
-            icons[i] = new ImageIcon(imageBytes);
+        for(int i = 0; i < totalUser; i++){
+            if(receivedPacket.get("user" + i + "_id") != null){
+                IDList[i] = Integer.parseInt(receivedPacket.get("user" + i + "_id"));
+                names[i] = receivedPacket.get("user" + i + "_name");
+                byte[] imageBytes = Base64.getDecoder().decode(receivedPacket.get("user" + i + "_characterIcon"));
+                icons[i] = new ImageIcon(imageBytes);
+            }
         }
 
         ClientFrame.getInstance().responseUserData(currentUser, totalUser, IDList, names, icons, yourID);
