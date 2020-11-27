@@ -21,6 +21,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 public class ClientFrame {
     private Connection connection;
@@ -156,6 +158,26 @@ public class ClientFrame {
         ((MainPage)pages.get(PageType.MAIN_PAGE)).requestRoomData();
     }
 
+    public void startGame(){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).startGame();
+    }
+
+    public void startRound(int round, boolean isTestTaker, String word, long curTime){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).startRound(round, isTestTaker, word, curTime);
+    }
+
+    public void drawImageReceived(ImageIcon draw){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).drawImageReceived(draw);
+    }
+
+    public void endRound(String score){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).endRound(score);
+    }
+
+    public void endGame(List<String> names, List<Integer> scores){
+        ((GamePage)pages.get(PageType.GAME_PAGE)).endGame(names, scores);
+    }
+
     public void send(Packet packet){
         connection.send(packet);
     }
@@ -172,7 +194,7 @@ public class ClientFrame {
         return LazyHolder.INSTANCE;
     }
 
-    private static class LazyHolder{
+    private static class LazyHolder {
         private static final ClientFrame INSTANCE = new ClientFrame();
     }
 }

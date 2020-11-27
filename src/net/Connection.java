@@ -19,8 +19,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class Connection {
@@ -43,19 +44,15 @@ public class Connection {
             while(true){
                 try {
                     selector.select();
-                    Iterator iterator = selector.selectedKeys().iterator();
 
-                    while(iterator.hasNext()){
-                        SelectionKey key = (SelectionKey)iterator.next();
-
-                        if(key.isReadable()){
+                    for (SelectionKey key : selector.selectedKeys()) {
+                        if (key.isReadable()) {
                             read(key);
                         }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         });
         clientThread.start();
@@ -67,7 +64,6 @@ public class Connection {
         try {
             buffer.clear();
             data.clear();
-
             while(client.read(data) > 0){
                 data.flip();
                 buffer.put(data);
@@ -76,35 +72,58 @@ public class Connection {
             buffer.flip();
             byte[] array = new byte[buffer.limit()];
             buffer.get(array, 0, buffer.limit());
-            Map<String, String> receivedPacket = DataMaker.make(new String(array));
+            List<Map<String, String>> receivedPackets = DataMaker.make(new String(array));
+            System.out.println();
 
-            PacketType type = PacketType.valueOf(receivedPacket.get("type"));
-            if(type == PacketType.RESPONSE_ROOM){
-                responseRoomData(receivedPacket);
-            }
-            else if(type == PacketType.RESPONSE_USER){
-                responseUserData(receivedPacket);
-            }
-            else if(type == PacketType.JOIN_ROOM_RESULT){
-                responseJoinRoomResult(receivedPacket);
-            }
-            else if(type == PacketType.CHAT){
-                ClientFrame.getInstance().chatReceived(receivedPacket.get("sender"), receivedPacket.get("content"));
-            }
-            else if(type == PacketType.READY){
-                readyStatusReceived(receivedPacket);
-            }
-            else if(type == PacketType.START_REQUEST){
-                ClientFrame.getInstance().responseStartResult(Boolean.parseBoolean(receivedPacket.get("status")));
-            }
-            else if(type == PacketType.DISCONNECT){
-                client.close();
-                JOptionPane.showMessageDialog(null, "서버가 종료 되었습니다.", "error",
-                        JOptionPane.ERROR_MESSAGE);
-                System.exit(2);
+            for(Map<String, String> receivedPacket : receivedPackets){
+                if(receivedPacket.isEmpty()){
+                    continue;
+                }
+                System.out.println(receivedPacket.toString());
+                PacketType type = PacketType.valueOf(receivedPacket.get("type"));
+                if(type == PacketType.RESPONSE_ROOM){
+                    responseRoomData(receivedPacket);
+                }
+                else if(type == PacketType.RESPONSE_USER){
+                    responseUserData(receivedPacket);
+                }
+                else if(type == PacketType.JOIN_ROOM_RESULT){
+                    responseJoinRoomResult(receivedPacket);
+                }
+                else if(type == PacketType.CHAT){
+                    ClientFrame.getInstance().chatReceived(receivedPacket.get("sender"), receivedPacket.get("content"));
+                }
+                else if(type == PacketType.READY){
+                    readyStatusReceived(receivedPacket);
+                }
+                else if(type == PacketType.START_REQUEST){
+                    ClientFrame.getInstance().responseStartResult(Boolean.parseBoolean(receivedPacket.get("status")));
+                }
+                else if(type == PacketType.DISCONNECT){
+                    client.close();
+                    JOptionPane.showMessageDialog(null, "서버가 종료 되었습니다.", "error",
+                            JOptionPane.ERROR_MESSAGE);
+                    System.exit(2);
+                }
+                else if(type == PacketType.START_GAME){
+                    ClientFrame.getInstance().startGame();
+                }
+                else if(type == PacketType.START_ROUND){
+                    ClientFrame.getInstance().startRound(Integer.parseInt(receivedPacket.get("round")),
+                            Boolean.parseBoolean(receivedPacket.get("testtaker")), receivedPacket.get("word"),
+                            Long.parseLong(receivedPacket.get("time")));
+                }
+                else if(type == PacketType.END_ROUND){
+                    endRound(receivedPacket);
+                }
+                else if(type == PacketType.DRAW){
+                    drawImageReceived(receivedPacket);
+                }
+                else if(type == PacketType.END_GAME){
+                    endGame(receivedPacket);
+                }
             }
 
-            //System.out.println(receivedPacket.toString()); // test
         } catch (IOException e) {
             disconnect();
             System.exit(1);
@@ -203,5 +222,32 @@ public class Connection {
         }
 
         ClientFrame.getInstance().readyStatusReceived(readyStatus, idList);
+    }
+
+    private void drawImageReceived(Map<String, String> receivedPacket){
+        byte[] drawBytes = Base64.getDecoder().decode(receivedPacket.get("image"));
+        ClientFrame.getInstance().drawImageReceived(new ImageIcon(drawBytes));
+    }
+
+
+    private void endRound(Map<String, String> receivedPacket) {
+        if(receivedPacket.containsKey("score")){
+            ClientFrame.getInstance().endRound(receivedPacket.get("score"));
+            return;
+        }
+        ClientFrame.getInstance().endRound(null);
+    }
+
+    private void endGame(Map<String, String> receivedPacket){
+        List<String> names = new ArrayList<>();
+        List<Integer> scores = new ArrayList<>();
+        int i = 0;
+        while(receivedPacket.containsKey("rank" + i + "_name")){
+            names.add(receivedPacket.get("rank" + i + "_name"));
+            scores.add(Integer.parseInt(receivedPacket.get("rank" + i + "_score")));
+            i++;
+        }
+
+        ClientFrame.getInstance().endGame(names, scores);
     }
 }
