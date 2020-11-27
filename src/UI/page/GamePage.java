@@ -38,6 +38,7 @@ public class GamePage extends Page {
     private volatile boolean isTimerRun;
     private long roundTime;
     private volatile boolean running;
+    private boolean isChatFrameActive;
 
     private ChatFrame chatFrame;
     private List<CharacterArea> characterAreas;
@@ -69,6 +70,7 @@ public class GamePage extends Page {
         isTimerRun = false;
         timer = null;
         running = false;
+        isChatFrameActive = false;
     }
 
     @Override
@@ -126,6 +128,23 @@ public class GamePage extends Page {
             }
         }
         page.repaint();
+
+        if(chatFrame == null){
+            chatFrame = new ChatFrame(ClientFrame.getInstance().getFrame().getX(),
+                    ClientFrame.getInstance().getFrame().getY());
+            chatFrame.getMessageInputArea().addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                        sendChat();
+                    }
+                }
+            });
+            chatFrame.getSendButton().addActionListener(e1 -> {
+                sendChat();
+            });
+        }
+
         Packet packet = new Packet(PacketType.READY);
         packet.addData("status", "request");
         ClientFrame.getInstance().send(packet);
@@ -171,6 +190,10 @@ public class GamePage extends Page {
     }
 
     private void quitRoom(){
+        if(chatFrame != null){
+            chatFrame.getFrame().setVisible(false);
+            chatFrame = null;
+        }
         ClientFrame.getInstance().quitRoom();
     }
 
@@ -345,19 +368,12 @@ public class GamePage extends Page {
         chatButton.setLocation(new Point(350, 880));
         chatButton.setBackground(Color.ORANGE);
         chatButton.addActionListener(e -> {
-            chatFrame = new ChatFrame(ClientFrame.getInstance().getFrame().getX(),
-                    ClientFrame.getInstance().getFrame().getY());
-            chatFrame.getMessageInputArea().addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyTyped(KeyEvent e) {
-                    if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                        sendChat();
-                    }
-                }
-            });
-            chatFrame.getSendButton().addActionListener(e1 -> {
-                sendChat();
-            });
+            if(!chatFrame.getFrame().isVisible()){
+                chatFrame.getFrame().setVisible(true);
+            }
+            else{
+                chatFrame.getFrame().setVisible(false);
+            }
         });
         chatButton.setVisible(true);
         page.add(chatButton);

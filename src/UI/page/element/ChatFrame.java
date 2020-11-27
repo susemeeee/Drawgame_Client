@@ -24,10 +24,10 @@ public class ChatFrame {
         frame = new JFrame("chat");
         frame.setSize(new Dimension(400, 1000));
         frame.setLocation(new Point(x + 1500, y));
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         frame.setLayout(null);
         frame.setBackground(Color.WHITE);
-        frame.setVisible(true);
+        frame.setVisible(false);
     }
 
     private void setView(){
