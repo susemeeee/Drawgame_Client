@@ -24,7 +24,7 @@ public class CharacterArea {
         panel = new JPanel();
         panel.setSize(new Dimension(200, 210));
         panel.setLocation(x, y);
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(new Color(222, 239, 255));
         panel.setLayout(null);
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         panel.setVisible(true);
@@ -57,9 +57,7 @@ public class CharacterArea {
     }
 
     private void setView(){
-        //TODO 테스트용으로 데이터 넣어놓은 거 변경
-        characterIconArea = new JLabel(changeImageSize(new ImageIcon("files/defaultusericon.png"),
-                130, 130));
+        characterIconArea = new JLabel();
         characterIconArea.setSize(new Dimension(130, 130));
         characterIconArea.setLocation(new Point(1, 1));
         characterIconArea.setVisible(true);
@@ -93,8 +91,7 @@ public class CharacterArea {
     private ImageIcon changeImageSize(ImageIcon icon, int width, int height){
         Image img = icon.getImage();
         Image newImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        ImageIcon newIcon = new ImageIcon(newImg);
-        return newIcon;
+        return new ImageIcon(newImg);
     }
 
     public JPanel getPanel() {

@@ -77,7 +77,7 @@ public class GamePage extends Page {
     protected void initPage() {
         page.setSize(new Dimension(1500, 1000));
         page.setLocation(new Point(0, 0));
-        page.setBackground(Color.WHITE);
+        page.setBackground(new Color(255, 255, 222));
         page.setLayout(null);
         page.setVisible(true);
     }
@@ -134,7 +134,7 @@ public class GamePage extends Page {
                     ClientFrame.getInstance().getFrame().getY());
             chatFrame.getMessageInputArea().addKeyListener(new KeyAdapter() {
                 @Override
-                public void keyTyped(KeyEvent e) {
+                public void keyPressed(KeyEvent e) {
                     if(e.getKeyCode() == KeyEvent.VK_ENTER){
                         sendChat();
                     }
@@ -303,7 +303,7 @@ public class GamePage extends Page {
     public void endGame(List<String> names, List<Integer> scores){
         StringBuilder resultText = new StringBuilder("게임이 종료 되었습니다\n");
         for(int i = 0; i < names.size(); i++){
-            resultText.append(i + "위: " + names.get(i) + "(" + scores.get(i) + " 점)\n");
+            resultText.append((i + 1) + "위: " + names.get(i) + "(" + scores.get(i) + " 점)\n");
         }
         JOptionPane.showMessageDialog(null, resultText.toString(), "game result",
                 JOptionPane.INFORMATION_MESSAGE);
@@ -316,16 +316,21 @@ public class GamePage extends Page {
         packet.addData("status", "request");
         ClientFrame.getInstance().send(packet);
 
-        quitButton = new JButton("나가기");
+        quitButton = new JButton(new ImageIcon("files/quitbutton.png"));
         quitButton.setSize(new Dimension(150, 70));
         quitButton.setLocation(new Point(800, 880));
-        quitButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
+        quitButton.setBackground(new Color(255, 255, 222));
+        quitButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 222), 1));
         quitButton.addActionListener(e -> {
             quitRoom();
         });
         quitButton.setVisible(true);
         page.add(quitButton);
 
+        if(canvas != null){
+            canvasPanel.remove(canvas);
+            canvas = null;
+        }
         if(toolPanel != null){
             toolPanel.setVisible(false);
             page.remove(toolPanel);
@@ -340,6 +345,7 @@ public class GamePage extends Page {
             Thread.onSpinWait();
         }
         timeArea.setText("");
+        gameNoticeArea.setText("게임 대기중");
     }
 
     @Override
@@ -378,10 +384,11 @@ public class GamePage extends Page {
         chatButton.setVisible(true);
         page.add(chatButton);
 
-        quitButton = new JButton("나가기");
+        quitButton = new JButton(new ImageIcon("files/quitbutton.png"));
         quitButton.setSize(new Dimension(150, 70));
         quitButton.setLocation(new Point(800, 880));
-        quitButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
+        quitButton.setBackground(new Color(255, 255, 222));
+        quitButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 222), 1));
         quitButton.addActionListener(e -> {
             quitRoom();
         });
@@ -391,30 +398,31 @@ public class GamePage extends Page {
         gameNoticeArea = new JLabel("게임 대기중");
         gameNoticeArea.setSize(new Dimension(200, 30));
         gameNoticeArea.setLocation(new Point(360, 10));
-        gameNoticeArea.setFont(new Font("SanSerif", Font.PLAIN, 18));
+        gameNoticeArea.setFont(new Font("SanSerif", Font.BOLD, 18));
         gameNoticeArea.setVisible(true);
         page.add(gameNoticeArea);
 
         timeArea = new JLabel();
         timeArea.setSize(new Dimension(200, 30));
         timeArea.setLocation(new Point(1010, 10));
-        timeArea.setFont(new Font("SanSerif", Font.PLAIN, 18));
+        timeArea.setFont(new Font("SanSerif", Font.BOLD, 18));
         timeArea.setVisible(true);
         page.add(timeArea);
 
         answerArea = new JLabel();
         answerArea.setSize(new Dimension(200, 30));
         answerArea.setLocation(new Point(750, 10));
-        answerArea.setFont(new Font("SanSerif", Font.PLAIN, 18));
+        answerArea.setFont(new Font("SanSerif", Font.BOLD, 18));
         answerArea.setVisible(true);
         page.add(answerArea);
     }
 
     private void generateStartButton(){
-        startButton = new JButton("START");
+        startButton = new JButton(new ImageIcon("files/startbutton.png"));
         startButton.setSize(new Dimension(150, 70));
         startButton.setLocation(new Point(1000, 880));
-        startButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
+        startButton.setBackground(new Color(255, 255, 222));
+        startButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 222), 1));
         startButton.addActionListener(e -> {
             start();
         });
@@ -425,10 +433,11 @@ public class GamePage extends Page {
     }
 
     private void generateReadyButton(){
-        readyButton = new JButton("READY");
+        readyButton = new JButton(new ImageIcon("files/readybutton.png"));
         readyButton.setSize(new Dimension(150, 70));
         readyButton.setLocation(new Point(1000, 880));
-        readyButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
+        readyButton.setBackground(new Color(255, 255, 222));
+        readyButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 222), 1));
         readyButton.addActionListener(e -> {
             isReady = !isReady;
             ready();

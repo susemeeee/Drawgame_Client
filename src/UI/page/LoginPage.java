@@ -27,14 +27,14 @@ public class LoginPage extends Page{
     protected void initPage() {
         page.setSize(new Dimension(1500, 1000));
         page.setLocation(new Point(0, 0));
-        page.setBackground(Color.WHITE);
+        page.setBackground(new Color(255, 255, 222));
         page.setLayout(null);
         page.setVisible(true);
     }
 
     @Override
     protected void setView() {
-        loginButton = new JButton("LOGIN");
+        loginButton = new JButton(new ImageIcon("files/loginbutton.png"));
         loginButton.setSize(new Dimension(400, 60));
         loginButton.setLocation(new Point(1000, 740));
         loginButton.setFont(new Font("SanSerif", Font.PLAIN, 24));
@@ -75,10 +75,11 @@ public class LoginPage extends Page{
         characterIconArea.setVisible(true);
         page.add(characterIconArea);
 
-        selectIconButton = new JButton("+");
+        selectIconButton = new JButton(new ImageIcon("files/choosebutton.png"));
         selectIconButton.setSize(new Dimension(50, 50));
         selectIconButton.setLocation(new Point(1350, 640));
-        selectIconButton.setFont(new Font("SanSerif", Font.BOLD, 28));
+        selectIconButton.setBackground(new Color(255, 255, 222));
+        selectIconButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 222), 1));
         selectIconButton.addActionListener(e -> {
             selectCharacter();
         });

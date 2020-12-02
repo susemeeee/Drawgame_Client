@@ -39,6 +39,7 @@ public class ChatFrame {
 
         chatArea = new JTextArea();
         chatArea.setEditable(false);
+        chatArea.setFont(new Font("SanSerif", Font.PLAIN, 20));
         scrollPane = new JScrollPane(chatArea);
         scrollPane.setVisible(true);
         chatArea.setVisible(true);
@@ -55,7 +56,7 @@ public class ChatFrame {
         sendButton = new JButton(new ImageIcon("files/sendchat.png"));
         sendButton.setSize(new Dimension(60, 40));
         sendButton.setLocation(320, 920);
-        sendButton.setFont(new Font("SanSerif", Font.BOLD, 24));
+        sendButton.setBackground(new Color(222, 239, 255));
         sendButton.setVisible(true);
         frame.add(sendButton);
     }

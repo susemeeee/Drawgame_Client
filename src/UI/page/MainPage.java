@@ -41,7 +41,7 @@ public class MainPage extends Page {
     protected void initPage() {
         page.setSize(new Dimension(1500, 1000));
         page.setLocation(new Point(0, 0));
-        page.setBackground(Color.WHITE);
+        page.setBackground(new Color(255, 255, 222));
         page.setLayout(null);
         page.setVisible(true);
     }
@@ -214,9 +214,10 @@ public class MainPage extends Page {
         pageNumberText.setVisible(true);
         page.add(pageNumberText);
 
-        prevPageButton = new JButton("<");
+        prevPageButton = new JButton(new ImageIcon("files/prevpagebutton.png"));
         prevPageButton.setSize(new Dimension(80, 50));
         prevPageButton.setLocation(new Point(320, 880));
+        prevPageButton.setBackground(new Color(222, 239, 255));
         prevPageButton.addActionListener(e -> {
             if(pageNumber > 1){
                 prevPageNumber = pageNumber;
@@ -224,26 +225,25 @@ public class MainPage extends Page {
             }
             requestRoomData();
         });
-        prevPageButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         prevPageButton.setVisible(true);
         page.add(prevPageButton);
 
-        nextPageButton = new JButton(">");
+        nextPageButton = new JButton(new ImageIcon("files/nextpagebutton.png"));
         nextPageButton.setSize(new Dimension(80, 50));
         nextPageButton.setLocation(new Point(600, 880));
+        nextPageButton.setBackground(new Color(222, 239, 255));
         nextPageButton.addActionListener(e -> {
             prevPageNumber = pageNumber;
             pageNumber++;
             requestRoomData();
         });
-        nextPageButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         nextPageButton.setVisible(true);
         page.add(nextPageButton);
 
         JPanel makeRoomPanel = new JPanel();
         makeRoomPanel.setSize(new Dimension(400, 620));
         makeRoomPanel.setLocation(new Point(1000, 100));
-        makeRoomPanel.setBackground(Color.WHITE);
+        makeRoomPanel.setBackground(new Color(222, 239, 255));
         makeRoomPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         makeRoomPanel.setVisible(true);
 
@@ -294,10 +294,9 @@ public class MainPage extends Page {
         round.setVisible(true);
         page.add(round);
 
-        makeRoomButton = new JButton("방 만들기");
+        makeRoomButton = new JButton(new ImageIcon("files/makeroombutton.png"));
         makeRoomButton.setSize(new Dimension(300, 60));
         makeRoomButton.setLocation(new Point(1050, 500));
-        makeRoomButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         makeRoomButton.addActionListener(e -> {
             makeRoom();
         });
@@ -306,10 +305,9 @@ public class MainPage extends Page {
 
         page.add(makeRoomPanel);
 
-        joinRoomButton = new JButton("방 입장");
+        joinRoomButton = new JButton(new ImageIcon("files/joinroombutton.png"));
         joinRoomButton.setSize(new Dimension(400, 80));
         joinRoomButton.setLocation(new Point(1000, 770));
-        joinRoomButton.setFont(new Font("SanSerif", Font.PLAIN, 28));
         joinRoomButton.addActionListener(e -> {
             joinRoom();
         });
