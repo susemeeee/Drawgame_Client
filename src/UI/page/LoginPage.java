@@ -34,6 +34,12 @@ public class LoginPage extends Page{
 
     @Override
     protected void setView() {
+        JLabel logoArea = new JLabel(new ImageIcon("files/logo.png"));
+        logoArea.setSize(new Dimension(550, 800));
+        logoArea.setLocation(new Point(100, 100));
+        logoArea.setVisible(true);
+        page.add(logoArea);
+
         loginButton = new JButton(new ImageIcon("files/loginbutton.png"));
         loginButton.setSize(new Dimension(400, 60));
         loginButton.setLocation(new Point(1000, 740));
